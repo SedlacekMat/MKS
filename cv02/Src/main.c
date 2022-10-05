@@ -36,8 +36,7 @@ void SysTick_Handler(void);
 void blikac(void);
 void tlacitka(void);
 
-int main(void)
-{
+int main(void) {
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN | RCC_AHBENR_GPIOCEN; // enable
 	GPIOA->MODER |= GPIO_MODER_MODER4_0; // LED1 = PA4, output
 	GPIOB->MODER |= GPIO_MODER_MODER0_0; // LED2 = PB0, output
@@ -53,64 +52,81 @@ int main(void)
 	SysTick_Config(8000); // timer 1ms
 
 	/* Loop forever */
-	for(;;){
+	for (;;) {
 		tlacitka();
+		blikac();
 	}
 }
 
-void EXTI0_1_IRQHandler(void)
-{
+void EXTI0_1_IRQHandler(void) {
 	if (EXTI->PR & EXTI_PR_PR0) { // check line 0 has triggered the IT
 		EXTI->PR |= EXTI_PR_PR0; // clear the pending bit
-		GPIOB->ODR ^= (1<<0);
+		GPIOB->ODR ^= (1 << 0);
 	}
 }
 
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
 	Tick++;
 }
 
-void blikac(void)
-{
+void blikac(void) {
 	static uint32_t delay;
 	if (Tick > delay + LED_TIME_BLINK) {
-		GPIOA->ODR ^= (1<<4);
+		GPIOA->ODR ^= (1 << 4);
 		delay = Tick;
 	}
 }
 
-void tlacitka(void)
-{
-	static uint32_t old_s2;
-	static uint32_t old_s1;
+void tlacitka(void) {
+	//static uint32_t old_s2;
+	//static uint32_t old_s1;
 	static uint32_t off_time_s2;
-	static uint32_t off_time_s1;
-	//static uint16_t debounce = 0xFFFF;
-	uint32_t new_s2 = GPIOC->IDR & (1<<0);
-	uint32_t new_s1 = GPIOC->IDR & (1<<1);
+	//static uint32_t off_time_s1;
+	static uint16_t debounce = 0xFFFF;
+	static uint32_t debounce_delay;
+	uint32_t new_s2 = GPIOC->IDR & (1 << 0);
+	//uint32_t new_s1 = GPIOC->IDR & (1<<1);
 
-	if (old_s2 && !new_s2) { // falling edge
-	off_time_s2 = Tick + LED_TIME_SHORT;
-	GPIOB->BSRR = (1<<0);
+	/*
+	 // roznout LED2
+	 if (old_s2 && !new_s2) { // falling edge
+	 off_time_s2 = Tick + LED_TIME_SHORT;
+	 GPIOB->BSRR = (1<<0);
+	 }
+	 old_s2 = new_s2;
+
+	 // roznout LED1
+	 if (old_s1 && !new_s1) { // falling edge
+	 off_time_s1 = Tick + LED_TIME_LONG;
+	 GPIOA->BSRR = (1<<4);
+	 }
+	 old_s1 = new_s1;
+
+	 // zhasnout LED2
+	 if (Tick > off_time_s2) {
+	 GPIOB->BRR = (1<<0);
+	 }
+
+	 // zhasnout LED1
+	 if (Tick > off_time_s1) {
+	 GPIOA->BRR = (1<<4);
+	 }
+	 */
+
+	if (Tick > debounce_delay + 5) {
+		debounce <<= 1;
+		if (new_s2)
+			debounce |= 0x0001;
+		if (debounce == 0x7FFF) {
+			off_time_s2 = Tick + LED_TIME_SHORT;
+			GPIOB->BSRR = (1 << 0);
+		}
+		debounce_delay = Tick;
 	}
-	old_s2 = new_s2;
-
-	if (old_s1 && !new_s1) { // falling edge
-	off_time_s1 = Tick + LED_TIME_LONG;
-	GPIOA->BSRR = (1<<4);
-	}
-	old_s1 = new_s1;
-
+	// zhasnout LED2
 	if (Tick > off_time_s2) {
-	GPIOB->BRR = (1<<0);
+		GPIOB->BRR = (1 << 0);
 	}
 
-	if (Tick > off_time_s1) {
-	GPIOA->BRR = (1<<4);
-	}
 }
-
-
-
 
