@@ -468,7 +468,7 @@ void tlacitka(void) {
  800035e:	2201      	movs	r2, #1
  8000360:	4013      	ands	r3, r2
  8000362:	607b      	str	r3, [r7, #4]
-	uint32_t new_s1 = GPIOC->IDR & (1<<1);
+	uint32_t new_s1 = GPIOC->IDR & (1 << 1);
  8000364:	4b27      	ldr	r3, [pc, #156]	; (8000404 <tlacitka+0xb0>)
  8000366:	691b      	ldr	r3, [r3, #16]
  8000368:	2202      	movs	r2, #2
@@ -478,8 +478,8 @@ void tlacitka(void) {
 	 old_s2 = new_s2;
 	 */
 
-	 // roznout LED1
-	 if (old_s1 && !new_s1) { // falling edge
+	// roznout LED1
+	if (old_s1 && !new_s1) { // falling edge
  800036e:	4b26      	ldr	r3, [pc, #152]	; (8000408 <tlacitka+0xb4>)
  8000370:	681b      	ldr	r3, [r3, #0]
  8000372:	2b00      	cmp	r3, #0
@@ -487,7 +487,7 @@ void tlacitka(void) {
  8000376:	683b      	ldr	r3, [r7, #0]
  8000378:	2b00      	cmp	r3, #0
  800037a:	d109      	bne.n	8000390 <tlacitka+0x3c>
-	 off_time = Tick + LED_TIME_LONG;
+		off_time = Tick + LED_TIME_LONG;
  800037c:	4b23      	ldr	r3, [pc, #140]	; (800040c <tlacitka+0xb8>)
  800037e:	681b      	ldr	r3, [r3, #0]
  8000380:	22fa      	movs	r2, #250	; 0xfa
@@ -495,19 +495,19 @@ void tlacitka(void) {
  8000384:	189a      	adds	r2, r3, r2
  8000386:	4b22      	ldr	r3, [pc, #136]	; (8000410 <tlacitka+0xbc>)
  8000388:	601a      	str	r2, [r3, #0]
-	 GPIOB->BSRR = (1<<0);
+		GPIOB->BSRR = (1 << 0);
  800038a:	4b22      	ldr	r3, [pc, #136]	; (8000414 <tlacitka+0xc0>)
  800038c:	2201      	movs	r2, #1
  800038e:	619a      	str	r2, [r3, #24]
-	 }
-	 old_s1 = new_s1;
+	}
+	old_s1 = new_s1;
  8000390:	4b1d      	ldr	r3, [pc, #116]	; (8000408 <tlacitka+0xb4>)
  8000392:	683a      	ldr	r2, [r7, #0]
  8000394:	601a      	str	r2, [r3, #0]
+	 if (Tick > off_time_s2) {
+	 GPIOB->BRR = (1<<0);
 	 }
 	 */
-
-
 
 	if (Tick > debounce_delay + 5) {
  8000396:	4b20      	ldr	r3, [pc, #128]	; (8000418 <tlacitka+0xc4>)
