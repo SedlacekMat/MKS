@@ -37,7 +37,7 @@ int main(void) {
 	for (;;) {
 		for(uint32_t i = 0; i<999; i+=111){
 			sct_value(i);
-			for (volatile uint32_t n = 0; n < 100000; n++) {}
+			for (volatile uint32_t n = 0; n < 500000; n++) {}
 		}
 	}
 }
