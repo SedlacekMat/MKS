@@ -30,10 +30,14 @@
 int main(void) {
 
 	sct_init();
-	sct_led(0x7A5C36DE);
+	//sct_led(0x7A5C36DE);
+	sct_value(999);
 
 	/* Loop forever */
 	for (;;) {
-
+		for(uint32_t i = 0; i<999; i+=111){
+			sct_value(i);
+			for (volatile uint32_t n = 0; n < 100000; n++) {}
+		}
 	}
 }
