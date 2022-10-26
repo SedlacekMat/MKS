@@ -78,8 +78,12 @@ static void uart_process_command(char *cmd) {
 	uint16_t addr;
 	uint8_t value;
 	token = strtok(cmd, " ");
+
+	//jghcv
 	if (strcasecmp(token, "HELLO") == 0) { //greet and respond
 		printf("Komunikace OK\n");
+
+	//hjgcfhgf
 	} else if (strcasecmp(token, "LED1") == 0){ //actions on first LED, turn on, off
 		token = strtok(NULL, " ");
 		if (strcasecmp(token, "ON") == 0) HAL_GPIO_WritePin(LED1_GPIO_Port,LED1_Pin,1);
@@ -98,14 +102,14 @@ static void uart_process_command(char *cmd) {
 	} else if (strcasecmp(token, "READ") == 0){ //read 1 byte from specified eeprom address
 		addr = atoi(strtok(NULL, " "));
 		HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
-		printf("Look what you made me do: \n\rAdresa 0x%04X = 0x%02X \n",addr,value);
+		printf("Adresa 0x%04X = 0x%02X \n",addr,value);
 	} else if (strcasecmp(token, "WRITE") == 0){ //write 1 byte to given address
 		addr = atoi(strtok(NULL, " "));
 		value = atoi(strtok(NULL, " "));
 		HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
 		while (HAL_I2C_IsDeviceReady(&hi2c1, EEPROM_ADDR, 300, 1000) == HAL_TIMEOUT) {}
-		printf("I did it, you happy now? \n");
-	} else if (strcasecmp(token, "DUMP") == 0){ //write 1 byte to given address
+		printf("Done \n");
+	} else if (strcasecmp(token, "DUMP") == 0){ //read first 16 bytes from memory
 		addr = 0;
 		for (addr = 0; addr < 16; addr++){
 			HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);

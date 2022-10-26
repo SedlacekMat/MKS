@@ -7,23 +7,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         000050e0  080000c0  080000c0  000100c0  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000390  080051a0  080051a0  000151a0  2**2
+  2 .rodata       00000360  080051a0  080051a0  000151a0  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08005530  08005530  00020070  2**0
+  3 .ARM.extab    00000000  08005500  08005500  00020070  2**0
                   CONTENTS
-  4 .ARM          00000000  08005530  08005530  00020070  2**0
+  4 .ARM          00000000  08005500  08005500  00020070  2**0
                   CONTENTS
-  5 .preinit_array 00000000  08005530  08005530  00020070  2**0
+  5 .preinit_array 00000000  08005500  08005500  00020070  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08005530  08005530  00015530  2**2
+  6 .init_array   00000004  08005500  08005500  00015500  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  08005534  08005534  00015534  2**2
+  7 .fini_array   00000004  08005504  08005504  00015504  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         00000070  20000000  08005538  00020000  2**2
+  8 .data         00000070  20000000  08005508  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          0000028c  20000070  080055a8  00020070  2**2
+  9 .bss          0000028c  20000070  08005578  00020070  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  200002fc  080055a8  000202fc  2**0
+ 10 ._user_heap_stack 00000604  200002fc  08005578  000202fc  2**0
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00020070  2**0
                   CONTENTS, READONLY
@@ -489,7 +489,7 @@ static void uart_process_command(char *cmd) {
  80003f2:	2302      	movs	r3, #2
  80003f4:	21a0      	movs	r1, #160	; 0xa0
  80003f6:	f001 fb2d 	bl	8001a54 <HAL_I2C_Mem_Read>
-		printf("Look what you made me do: \n\rAdresa 0x%04X = 0x%02X \n",addr,value);
+		printf("Adresa 0x%04X = 0x%02X \n",addr,value);
  80003fa:	193b      	adds	r3, r7, r4
  80003fc:	8819      	ldrh	r1, [r3, #0]
  80003fe:	197b      	adds	r3, r7, r5
@@ -559,7 +559,7 @@ static void uart_process_command(char *cmd) {
  8000482:	0003      	movs	r3, r0
  8000484:	2b03      	cmp	r3, #3
  8000486:	d0f4      	beq.n	8000472 <uart_process_command+0x212>
-		printf("I did it, you happy now? \n");
+		printf("Done \n");
  8000488:	4b55      	ldr	r3, [pc, #340]	; (80005e0 <uart_process_command+0x380>)
  800048a:	0018      	movs	r0, r3
  800048c:	f003 fcc8 	bl	8003e20 <puts>
@@ -720,12 +720,12 @@ static void uart_process_command(char *cmd) {
  80005d0:	08005224 	.word	0x08005224
  80005d4:	2000008c 	.word	0x2000008c
  80005d8:	0800522c 	.word	0x0800522c
- 80005dc:	08005264 	.word	0x08005264
- 80005e0:	0800526c 	.word	0x0800526c
- 80005e4:	08005288 	.word	0x08005288
- 80005e8:	08005290 	.word	0x08005290
- 80005ec:	08005298 	.word	0x08005298
- 80005f0:	080052a0 	.word	0x080052a0
+ 80005dc:	08005248 	.word	0x08005248
+ 80005e0:	08005250 	.word	0x08005250
+ 80005e4:	08005258 	.word	0x08005258
+ 80005e8:	08005260 	.word	0x08005260
+ 80005ec:	08005268 	.word	0x08005268
+ 80005f0:	08005270 	.word	0x08005270
 
 080005f4 <uart_byte_available>:
 
@@ -2273,7 +2273,7 @@ LoopForever:
   ldr r1, =_edata
  8000db0:	20000070 	.word	0x20000070
   ldr r2, =_sidata
- 8000db4:	08005538 	.word	0x08005538
+ 8000db4:	08005508 	.word	0x08005508
   ldr r2, =_sbss
  8000db8:	20000070 	.word	0x20000070
   ldr r4, =_ebss
@@ -8066,7 +8066,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  8002c80:	40021000 	.word	0x40021000
  8002c84:	00001388 	.word	0x00001388
  8002c88:	fffff8ff 	.word	0xfffff8ff
- 8002c8c:	080052cc 	.word	0x080052cc
+ 8002c8c:	0800529c 	.word	0x0800529c
  8002c90:	20000000 	.word	0x20000000
 
 08002c94 <HAL_RCC_GetSysClockFreq>:
@@ -8214,8 +8214,8 @@ uint32_t HAL_RCC_GetSysClockFreq(void)
  8002d46:	b00f      	add	sp, #60	; 0x3c
  8002d48:	bd90      	pop	{r4, r7, pc}
  8002d4a:	46c0      	nop			; (mov r8, r8)
- 8002d4c:	080052ac 	.word	0x080052ac
- 8002d50:	080052bc 	.word	0x080052bc
+ 8002d4c:	0800527c 	.word	0x0800527c
+ 8002d50:	0800528c 	.word	0x0800528c
  8002d54:	40021000 	.word	0x40021000
  8002d58:	007a1200 	.word	0x007a1200
 
@@ -8266,7 +8266,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8002d90:	bd80      	pop	{r7, pc}
  8002d92:	46c0      	nop			; (mov r8, r8)
  8002d94:	40021000 	.word	0x40021000
- 8002d98:	080052dc 	.word	0x080052dc
+ 8002d98:	080052ac 	.word	0x080052ac
 
 08002d9c <HAL_RCCEx_PeriphCLKConfig>:
   *         the backup registers) and RCC_BDCR register are set to their reset values.
@@ -11083,10 +11083,10 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8003cba:	4798      	blx	r3
  8003cbc:	3601      	adds	r6, #1
  8003cbe:	e7f2      	b.n	8003ca6 <__libc_init_array+0x1e>
- 8003cc0:	08005530 	.word	0x08005530
- 8003cc4:	08005530 	.word	0x08005530
- 8003cc8:	08005530 	.word	0x08005530
- 8003ccc:	08005534 	.word	0x08005534
+ 8003cc0:	08005500 	.word	0x08005500
+ 8003cc4:	08005500 	.word	0x08005500
+ 8003cc8:	08005500 	.word	0x08005500
+ 8003ccc:	08005504 	.word	0x08005504
 
 08003cd0 <memset>:
  8003cd0:	0003      	movs	r3, r0
@@ -11244,9 +11244,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8003e0e:	6022      	str	r2, [r4, #0]
  8003e10:	701d      	strb	r5, [r3, #0]
  8003e12:	e7bf      	b.n	8003d94 <_puts_r+0x58>
- 8003e14:	080054bc 	.word	0x080054bc
- 8003e18:	080054dc 	.word	0x080054dc
- 8003e1c:	0800549c 	.word	0x0800549c
+ 8003e14:	0800548c 	.word	0x0800548c
+ 8003e18:	080054ac 	.word	0x080054ac
+ 8003e1c:	0800546c 	.word	0x0800546c
 
 08003e20 <puts>:
  8003e20:	b510      	push	{r4, lr}
@@ -11283,7 +11283,7 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8003e5e:	2b00      	cmp	r3, #0
  8003e60:	d1ed      	bne.n	8003e3e <strcasecmp+0xa>
  8003e62:	bdf0      	pop	{r4, r5, r6, r7, pc}
- 8003e64:	08005399 	.word	0x08005399
+ 8003e64:	08005369 	.word	0x08005369
 
 08003e68 <strtok>:
  8003e68:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
@@ -11330,8 +11330,8 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8003ec0:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
  8003ec2:	46c0      	nop			; (mov r8, r8)
  8003ec4:	2000000c 	.word	0x2000000c
- 8003ec8:	080052e8 	.word	0x080052e8
- 8003ecc:	080052ff 	.word	0x080052ff
+ 8003ec8:	080052b8 	.word	0x080052b8
+ 8003ecc:	080052cf 	.word	0x080052cf
 
 08003ed0 <__strtok_r>:
  8003ed0:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -11520,7 +11520,7 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  800403e:	260a      	movs	r6, #10
  8004040:	e7a1      	b.n	8003f86 <_strtol_l.constprop.0+0x56>
  8004042:	46c0      	nop			; (mov r8, r8)
- 8004044:	08005399 	.word	0x08005399
+ 8004044:	08005369 	.word	0x08005369
  8004048:	7fffffff 	.word	0x7fffffff
 
 0800404c <strtol>:
@@ -11612,9 +11612,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  80040fe:	2601      	movs	r6, #1
  8004100:	4276      	negs	r6, r6
  8004102:	e7ea      	b.n	80040da <__swbuf_r+0x76>
- 8004104:	080054bc 	.word	0x080054bc
- 8004108:	080054dc 	.word	0x080054dc
- 800410c:	0800549c 	.word	0x0800549c
+ 8004104:	0800548c 	.word	0x0800548c
+ 8004108:	080054ac 	.word	0x080054ac
+ 800410c:	0800546c 	.word	0x0800546c
 
 08004110 <__swsetup_r>:
  8004110:	4b37      	ldr	r3, [pc, #220]	; (80041f0 <__swsetup_r+0xe0>)
@@ -11727,9 +11727,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  80041ec:	60a2      	str	r2, [r4, #8]
  80041ee:	e7ef      	b.n	80041d0 <__swsetup_r+0xc0>
  80041f0:	2000000c 	.word	0x2000000c
- 80041f4:	080054bc 	.word	0x080054bc
- 80041f8:	080054dc 	.word	0x080054dc
- 80041fc:	0800549c 	.word	0x0800549c
+ 80041f4:	0800548c 	.word	0x0800548c
+ 80041f8:	080054ac 	.word	0x080054ac
+ 80041fc:	0800546c 	.word	0x0800546c
 
 08004200 <__assert_func>:
  8004200:	b530      	push	{r4, r5, lr}
@@ -11753,9 +11753,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8004224:	f000 f9b8 	bl	8004598 <fiprintf>
  8004228:	f000 fee2 	bl	8004ff0 <abort>
  800422c:	2000000c 	.word	0x2000000c
- 8004230:	0800535c 	.word	0x0800535c
- 8004234:	08005397 	.word	0x08005397
- 8004238:	08005369 	.word	0x08005369
+ 8004230:	0800532c 	.word	0x0800532c
+ 8004234:	08005367 	.word	0x08005367
+ 8004238:	08005339 	.word	0x08005339
 
 0800423c <__sflush_r>:
  800423c:	b5f7      	push	{r0, r1, r2, r4, r5, r6, r7, lr}
@@ -11952,9 +11952,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  80043c2:	68ec      	ldr	r4, [r5, #12]
  80043c4:	e7da      	b.n	800437c <_fflush_r+0x28>
  80043c6:	46c0      	nop			; (mov r8, r8)
- 80043c8:	080054bc 	.word	0x080054bc
- 80043cc:	080054dc 	.word	0x080054dc
- 80043d0:	0800549c 	.word	0x0800549c
+ 80043c8:	0800548c 	.word	0x0800548c
+ 80043cc:	080054ac 	.word	0x080054ac
+ 80043d0:	0800546c 	.word	0x0800546c
 
 080043d4 <std>:
  80043d4:	2300      	movs	r3, #0
@@ -12096,7 +12096,7 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  80044fa:	2301      	movs	r3, #1
  80044fc:	61a3      	str	r3, [r4, #24]
  80044fe:	e7d2      	b.n	80044a6 <__sinit+0xe>
- 8004500:	080052e4 	.word	0x080052e4
+ 8004500:	080052b4 	.word	0x080052b4
  8004504:	0800441d 	.word	0x0800441d
 
 08004508 <__sfp>:
@@ -12161,7 +12161,7 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  800458a:	603b      	str	r3, [r7, #0]
  800458c:	e7ef      	b.n	800456e <__sfp+0x66>
  800458e:	46c0      	nop			; (mov r8, r8)
- 8004590:	080052e4 	.word	0x080052e4
+ 8004590:	080052b4 	.word	0x080052b4
  8004594:	ffff0001 	.word	0xffff0001
 
 08004598 <fiprintf>:
@@ -12889,12 +12889,12 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8004b4c:	f000 f882 	bl	8004c54 <_printf_i>
  8004b50:	e7e3      	b.n	8004b1a <_vfiprintf_r+0x21a>
  8004b52:	46c0      	nop			; (mov r8, r8)
- 8004b54:	080054bc 	.word	0x080054bc
- 8004b58:	080054dc 	.word	0x080054dc
- 8004b5c:	0800549c 	.word	0x0800549c
- 8004b60:	080054fc 	.word	0x080054fc
- 8004b64:	08005502 	.word	0x08005502
- 8004b68:	08005506 	.word	0x08005506
+ 8004b54:	0800548c 	.word	0x0800548c
+ 8004b58:	080054ac 	.word	0x080054ac
+ 8004b5c:	0800546c 	.word	0x0800546c
+ 8004b60:	080054cc 	.word	0x080054cc
+ 8004b64:	080054d2 	.word	0x080054d2
+ 8004b68:	080054d6 	.word	0x080054d6
  8004b6c:	00000000 	.word	0x00000000
  8004b70:	080048db 	.word	0x080048db
 
@@ -13269,8 +13269,8 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8004e6a:	e7e9      	b.n	8004e40 <_printf_i+0x1ec>
  8004e6c:	2500      	movs	r5, #0
  8004e6e:	e7f7      	b.n	8004e60 <_printf_i+0x20c>
- 8004e70:	0800550d 	.word	0x0800550d
- 8004e74:	0800551e 	.word	0x0800551e
+ 8004e70:	080054dd 	.word	0x080054dd
+ 8004e74:	080054ee 	.word	0x080054ee
 
 08004e78 <_putc_r>:
  8004e78:	b570      	push	{r4, r5, r6, lr}
@@ -13337,9 +13337,9 @@ static void UART_DMAError(DMA_HandleTypeDef *hdma)
  8004ef8:	f7ff f8b4 	bl	8004064 <__swbuf_r>
  8004efc:	0005      	movs	r5, r0
  8004efe:	e7e3      	b.n	8004ec8 <_putc_r+0x50>
- 8004f00:	080054bc 	.word	0x080054bc
- 8004f04:	080054dc 	.word	0x080054dc
- 8004f08:	0800549c 	.word	0x0800549c
+ 8004f00:	0800548c 	.word	0x0800548c
+ 8004f04:	080054ac 	.word	0x080054ac
+ 8004f08:	0800546c 	.word	0x0800546c
 
 08004f0c <_sbrk_r>:
  8004f0c:	2300      	movs	r3, #0
