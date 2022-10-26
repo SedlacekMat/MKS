@@ -1,3 +1,0 @@
-../Core/Inc/sct.c:15:6:sct_led	24	static
-../Core/Inc/sct.c:26:6:sct_init	8	static
-../Core/Inc/sct.c:75:6:sct_value	24	static
