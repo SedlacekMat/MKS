@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +35,7 @@
 /* USER CODE BEGIN PD */
 #define RX_BUFFER_LEN 64
 #define CMD_BUFFER_LEN 256
+#define EEPROM_ADDR 0xA0
 #define uart_rx_write_ptr (RX_BUFFER_LEN - hdma_usart2_rx.Instance->CNDTR)
 /* USER CODE END PD */
 
@@ -43,6 +45,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 
@@ -56,6 +60,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -67,27 +72,53 @@ int _write(int file, char const *buf, int n) {
 	HAL_UART_Transmit(&huart2, (uint8_t*) (buf), n, HAL_MAX_DELAY);
 	return n;
 }
-
+//function for converting text to actions
 static void uart_process_command(char *cmd) {
 	char *token;
+	uint16_t addr;
+	uint8_t value;
 	token = strtok(cmd, " ");
-	if (strcasecmp(token, "HELLO") == 0) { //
+	if (strcasecmp(token, "HELLO") == 0) { //greet and respond
 		printf("Komunikace OK\n");
-	} else if (strcasecmp(token, "LED1") == 0){ //
+	} else if (strcasecmp(token, "LED1") == 0){ //actions on first LED, turn on, off
 		token = strtok(NULL, " ");
 		if (strcasecmp(token, "ON") == 0) HAL_GPIO_WritePin(LED1_GPIO_Port,LED1_Pin,1);
 		else if (strcasecmp(token, "OFF") == 0) HAL_GPIO_WritePin(LED1_GPIO_Port,LED1_Pin,0);
 		else printf("LED1 WHAT?\n");
-	} else if (strcasecmp(token, "LED2") == 0){ //
+	} else if (strcasecmp(token, "LED2") == 0){ //actions on second LED, turn on, off
 		token = strtok(NULL, " ");
 		if (strcasecmp(token, "ON") == 0) HAL_GPIO_WritePin(LED2_GPIO_Port,LED2_Pin,1);
 		else if (strcasecmp(token, "OFF") == 0) HAL_GPIO_WritePin(LED2_GPIO_Port,LED2_Pin,0);
 		else printf("LED2 WHAT?\n");
-	} else if (strcasecmp(token, "STATUS") == 0){ //
+	} else if (strcasecmp(token, "STATUS") == 0){ //check if LEDs are on/off
 		if(HAL_GPIO_ReadPin(LED1_GPIO_Port,LED1_Pin)) printf("LED1: ON; ");
 		else printf("LED1: OFF; ");
 		if(HAL_GPIO_ReadPin(LED2_GPIO_Port,LED2_Pin)) printf("LED2: ON \n");
 		else printf("LED2: OFF \n");
+	} else if (strcasecmp(token, "READ") == 0){ //read 1 byte from specified eeprom address
+		addr = atoi(strtok(NULL, " "));
+		HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
+		printf("Look what you made me do: \n\rAdresa 0x%04X = 0x%02X \n",addr,value);
+	} else if (strcasecmp(token, "WRITE") == 0){ //write 1 byte to given address
+		addr = atoi(strtok(NULL, " "));
+		value = atoi(strtok(NULL, " "));
+		HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
+		while (HAL_I2C_IsDeviceReady(&hi2c1, EEPROM_ADDR, 300, 1000) == HAL_TIMEOUT) {}
+		printf("I did it, you happy now? \n");
+	} else if (strcasecmp(token, "DUMP") == 0){ //write 1 byte to given address
+		addr = 0;
+		for (addr = 0; addr < 16; addr++){
+			HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
+			printf("%02X ",value);
+			if ((addr + 1)%8 == 0) printf("\n");
+		}
+	} else if (strcasecmp(token, "ORDER66") == 0){ //write 1 byte to given address
+		value = 66;
+		for (addr = 0; addr < 4096; addr++){
+			HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, addr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
+			while (HAL_I2C_IsDeviceReady(&hi2c1, EEPROM_ADDR, 300, 1000) == HAL_TIMEOUT) {}
+		}
+		printf("It is done \n");
 	}
 }
 
@@ -134,6 +165,7 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_DMA(&huart2, uart_rx_buf, RX_BUFFER_LEN);
   /* USER CODE END 2 */
@@ -162,6 +194,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -190,6 +223,60 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x2000090E;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
