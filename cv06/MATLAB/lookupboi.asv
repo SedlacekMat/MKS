@@ -1,0 +1,8 @@
+clear all
+close all
+
+tempData = csvread("ntc.csv");
+res = tempData(:,2);
+
+for i=1:length(res)
+adc(i) = res(i)*1e3/(res(i)*1e3+1)*2^10
