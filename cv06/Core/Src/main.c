@@ -103,6 +103,7 @@ int main(void)
   sct_init();
   static uint8_t TickFlag = 1;
   static uint32_t InitTick = 0;
+  static uint8_t DidIDoIt = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,8 +127,9 @@ int main(void)
 
 		  if(HAL_GetTick()>=InitTick+DIG_WAIT){
 			  OWReadTemperature(&temp_18b20);					// read converted data
-			  sct_value(temp_18b20/10,4);						// display data on 7-segment display
+			  sct_value(temp_18b20/10,DidIDoIt);				// display data on 7-segment display
 			  TickFlag = 1;										// reset flag for getting initial Tick value
+			  DidIDoIt = DidIDoIt^1;
 		  }
 
 		  if(!HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin)) {state = SHOW_AN; TickFlag = 1;}		//check for button press => go to AN state
@@ -144,9 +146,10 @@ int main(void)
 		  }
 
 		  if(HAL_GetTick()>=InitTick+AN_WAIT){
-			  adc = HAL_ADC_GetValue(&hadc);						// read adc value; connected to NTCC-10K termistor
-			  sct_value(NTC_LOOK[adc], 8);							// find temp value at corresponding index in a lookup table
+			  adc = HAL_ADC_GetValue(&hadc);					// read adc value; connected to NTCC-10K termistor
+			  sct_value(NTC_LOOK[adc],DidIDoIt);				// find temp value at corresponding index in a lookup table
 			  TickFlag = 1;
+			  DidIDoIt = DidIDoIt^1;
 		  }
 
 		  if(!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)) {state = SHOW_DIG; TickFlag = 1;}		//check for button press => go to DIG state
