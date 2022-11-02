@@ -33,6 +33,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DIG_WAIT 750
+#define AN_WAIT 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -99,6 +101,8 @@ int main(void)
 
   OWInit();									// Initialize 1-wire communication and the 7-segment disp. driver
   sct_init();
+  static uint8_t TickFlag = 1;
+  static uint32_t InitTick = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,23 +117,39 @@ int main(void)
 
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);		// turn on LED2
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);		// turn off LED1
-		  OWConvertAll();     									// start data conversion from DS18B20
-		  HAL_Delay(CONVERT_T_DELAY);     						// wait for data conversion
-		  OWReadTemperature(&temp_18b20);						// read converted data
-		  sct_value(temp_18b20/10,4);							// display data on 7-segment display
+		  OWConvertAll();										// start data conversion from DS18B20
+		  // get initial time, set flag LOW
+		  if(TickFlag){
+			  InitTick = HAL_GetTick();
+			  TickFlag = 0;
+		  }
 
-		  if(!HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin)) state = SHOW_AN;		//check for button press => go to AN state
+		  if(HAL_GetTick()>=InitTick+DIG_WAIT){
+			  OWReadTemperature(&temp_18b20);					// read converted data
+			  sct_value(temp_18b20/10,4);						// display data on 7-segment display
+			  TickFlag = 1;										// reset flag for getting initial Tick value
+		  }
+
+		  if(!HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin)) {state = SHOW_AN; TickFlag = 1;}		//check for button press => go to AN state
 	  }
 	  // read from analog sensor
 	  else if(state==SHOW_AN){
 
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);		// turn on LED1
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);		// turn off LED2
-		  adc = HAL_ADC_GetValue(&hadc);						// read adc value; connected to NTCC-10K termistor
-		  sct_value(NTC_LOOK[adc], 8);							// find temp value at corresponding index in a lookup table
-		  HAL_Delay(100);										// wait 100 ms
+		  // get initial Tick value, set flag low
+		  if(TickFlag){
+			  InitTick = HAL_GetTick();
+			  TickFlag = 0;
+		  }
 
-		  if(!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)) state = SHOW_DIG;		//check for button press => go to DIG state
+		  if(HAL_GetTick()>=InitTick+AN_WAIT){
+			  adc = HAL_ADC_GetValue(&hadc);						// read adc value; connected to NTCC-10K termistor
+			  sct_value(NTC_LOOK[adc], 8);							// find temp value at corresponding index in a lookup table
+			  TickFlag = 1;
+		  }
+
+		  if(!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)) {state = SHOW_DIG; TickFlag = 1;}		//check for button press => go to DIG state
 	  }
 
     /* USER CODE END WHILE */
