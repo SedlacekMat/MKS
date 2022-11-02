@@ -97,7 +97,7 @@ int main(void)
   HAL_ADCEx_Calibration_Start(&hadc);
   HAL_ADC_Start(&hadc);
 
-  OWInit();
+  OWInit();									// Initialize 1-wire communication and the 7-segment disp. driver
   sct_init();
   /* USER CODE END 2 */
 
@@ -105,17 +105,33 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  /*int16_t temp_18b20;
-	  OWConvertAll();
-	  HAL_Delay(CONVERT_T_DELAY);
-	  OWReadTemperature(&temp_18b20);
-
-	  sct_value(temp_18b20/10,4);*/
-
+	  int16_t temp_18b20;
 	  uint16_t adc;
-	  adc = HAL_ADC_GetValue(&hadc);
-	  sct_value(NTC_LOOK[adc], 8);
-	  HAL_Delay(100);
+	  static enum {SHOW_DIG, SHOW_AN} state = SHOW_DIG;
+	  // read from digital sensor
+	  if(state==SHOW_DIG){
+
+		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);		// turn on LED2
+		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);		// turn off LED1
+		  OWConvertAll();     									// start data conversion from DS18B20
+		  HAL_Delay(CONVERT_T_DELAY);     						// wait for data conversion
+		  OWReadTemperature(&temp_18b20);						// read converted data
+		  sct_value(temp_18b20/10,4);							// display data on 7-segment display
+
+		  if(!HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin)) state = SHOW_AN;		//check for button press => go to AN state
+	  }
+	  // read from analog sensor
+	  else if(state==SHOW_AN){
+
+		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);		// turn on LED1
+		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);		// turn off LED2
+		  adc = HAL_ADC_GetValue(&hadc);						// read adc value; connected to NTCC-10K termistor
+		  sct_value(NTC_LOOK[adc], 8);							// find temp value at corresponding index in a lookup table
+		  HAL_Delay(100);										// wait 100 ms
+
+		  if(!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)) state = SHOW_DIG;		//check for button press => go to DIG state
+	  }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
