@@ -31,6 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DELAYBOI 3000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,6 +46,9 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 static volatile int8_t key = -1;
+const int8_t pass[5] = { 1, 2, 3, 4, 5 };
+int8_t pos = 0;
+int8_t check;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,6 +100,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim3);
+  uint32_t lastPress = 0;
+  uint8_t keyPressed = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,10 +109,39 @@ int main(void)
   while (1)
   {
 	  if(key != -1){
-		  printf("Key %d\n",key);
+		  keyPressed = 1;
+		  lastPress = HAL_GetTick();
+		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin,0);
+		  printf("Key %d; pos %d\n",key,pos);
+		  if(key!=pass[pos]){
+			  check =+ 1;
+		  }
 		  HAL_Delay(250);
+		  if(pos >= 4 && check == 0){
+			  printf("Good\n");
+			  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin,1);
+			  pos = -1;
+			  check = 0;
+			  keyPressed = 0;
+		  }else if(pos >= 4 && check != 0){
+			  printf("Wrong \n");
+			  pos = -1;
+			  check = 0;
+			  keyPressed = 0;
+		  }
 		  key = -1;
+		  pos += 1;
+
 	  }
+	  uint32_t now = HAL_GetTick();
+	  if((now >(lastPress+DELAYBOI)) && keyPressed){
+		  printf("Timeout \n");
+		  pos = 0;
+		  key = -1;
+		  check = 0;
+		  keyPressed = 0;
+	  }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
