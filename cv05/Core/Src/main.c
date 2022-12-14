@@ -79,11 +79,9 @@ static void uart_process_command(char *cmd) {
 	uint8_t value;
 	token = strtok(cmd, " ");
 
-	//jghcv
+	//decision tree
 	if (strcasecmp(token, "HELLO") == 0) { //greet and respond
 		printf("Komunikace OK\n");
-
-	//hjgcfhgf
 	} else if (strcasecmp(token, "LED1") == 0){ //actions on first LED, turn on, off
 		token = strtok(NULL, " ");
 		if (strcasecmp(token, "ON") == 0) HAL_GPIO_WritePin(LED1_GPIO_Port,LED1_Pin,1);

@@ -60,8 +60,8 @@ all: main-build
 main-build: cv05.elf secondary-outputs
 
 # Tool invocations
-cv05.elf cv05.map: $(OBJS) $(USER_OBJS) C:\Temp\Sedlacek\MKS\cv05\STM32F030R8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "cv05.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Temp\Sedlacek\MKS\cv05\STM32F030R8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="cv05.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+cv05.elf cv05.map: $(OBJS) $(USER_OBJS) C:\Temp\MKS\cv05\STM32F030R8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "cv05.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Temp\MKS\cv05\STM32F030R8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="cv05.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
